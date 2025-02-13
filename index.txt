@@ -1,0 +1,8 @@
+email
+full names
+usuername
+location
+password
+confirmpassword
+phoneNumber
+birthDate

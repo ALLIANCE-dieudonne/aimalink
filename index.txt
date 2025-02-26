@@ -6,3 +6,6 @@ password
 confirmpassword
 phoneNumber
 birthDate
+
+mongodb+srv://admin:admin@cluster0.fvwyc.mongodb.net
+d2c4a3d8b8f99fe0f7a3b6d5bfe0f2edba1f507241df07e1e72ac2e4b0cc9f3f5c8c189e4c788f54e5092fcafab90e85e2eaf46a47f27c36b295fe48fe8de02e

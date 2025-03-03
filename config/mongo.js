@@ -5,7 +5,10 @@ const connectDB = async () => {
     console.log("Connected to db online...");
   });
 
-  await mongoose.connect(`${process.env.MONGO_URL}/users`).catch((err) => console.log(err));
+  await mongoose.connect(`${process.env.MONGO_URL}/users`, {
+    serverSelectionTimeoutMS: 30000, // 30 seconds
+    socketTimeoutMS: 45000, // 45 seconds
+  }).catch((err) => console.log(err));
 };
 
 

@@ -29,7 +29,7 @@ export const createUserSchema = {
   location: {
     optional: true,
     isString: {
-      errorMessage: "Location must be a valid string",
+      errorMessage: "Location is invalid",
     },
   },
   password: {

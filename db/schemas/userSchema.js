@@ -6,7 +6,6 @@ const userSchema = new mongoose.Schema({
     type: String,
     required: [true, "Email is required"],
     unique: true,
-    lowercase: true,
     validate: [validator.isEmail, "Invalid email format"],
   },
   fullNames: {
@@ -25,15 +24,24 @@ const userSchema = new mongoose.Schema({
     ],
   },
   location: {
-    type: String,
-    required: [true, "Location is required"],
+    latitude: {
+      type: Number,
+      required: [true, "Latitude is required"],
+      min: [-90, "Latitude must be between -90 and 90"],
+      max: [90, "Latitude must be between -90 and 90"],
+    },
+    longitude: {
+      type: Number,
+      required: [true, "Longitude is required"],
+      min: [-180, "Longitude must be between -180 and 180"],
+      max: [180, "Longitude must be between -180 and 180"],
+    },
   },
   password: {
     type: String,
     required: [true, "Password is required"],
     minlength: [8, "Password must be at least 8 characters long"],
   },
-
   phoneNumber: {
     type: String,
     required: [true, "Phone number is required"],
@@ -75,6 +83,10 @@ const userSchema = new mongoose.Schema({
     required: [true, "Gender is required"],
   },
   rememberMe: {
+    type: Boolean,
+    default: false,
+  },
+  didRapidPass: {
     type: Boolean,
     default: false,
   },

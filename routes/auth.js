@@ -10,7 +10,7 @@ import { Strategy as FacebookStrategy } from "passport-facebook";
 import bcrypt from "bcrypt";
 import UserOtp from "../db/schemas/userOTP.js";
 import { sendMail } from "../utils/email.js";
-import { verifyOTP, login, signUp, resendOTP } from "../controllers/authController.js";
+import { verifyOTP, login, signUp, resendOTP,logout } from "../controllers/authController.js";
 import "../middleware/authMiddleware.js"
 
 
@@ -138,7 +138,6 @@ router.post(
 );
 
 
-
 router.post(
   "/verify-otp",
   verifyOTP
@@ -150,6 +149,8 @@ router.get(
 );
 
 router.post("/auth/resend-otp",resendOTP);
+
+router.post("/auth/logout",logout)
 
 
 router.get(

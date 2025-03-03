@@ -1,5 +1,5 @@
 import { matchedData, validationResult } from "express-validator";
-import { comparePassword, hashPassword } from "../utils/helpers.js";
+import { comparePassword, hashPassword, getCoordinatesFromLocation } from "../utils/helpers.js";
 import User from "../db/schemas/userSchema.js";
 import { generateToken } from "../utils/jwt.js";
 import { sendMail } from "../utils/email.js";
@@ -19,13 +19,22 @@ export const signUp = async (req, res) => {
   // Extract validated data
   const data = matchedData(req);
 
+  const location = data.location;
+
+ 
+
   try {
+
+    const coordinates = await getCoordinatesFromLocation(location);
+
+    data.location = coordinates;
     // Hash the password securely
     data.password = hashPassword(data.password);
 
     data.verified = false;
     // Remove confirmPassword before saving
     delete data.confirmPassword;
+
 
     // Create and save the user
     const newUser = new User(data);
@@ -123,11 +132,9 @@ export const resendOTP = async (req, res) => {
     if (!userOtpRecord) {
       console.log("No existing OTP found, creating a new one.");
     } else if (Date.now() < userOtpRecord.expiresAt) {
-      return res
-        .status(400)
-        .json({
-          message: "OTP already sent. Please wait before requesting a new one.",
-        });
+      return res.status(400).json({
+        message: "OTP already sent. Please wait before requesting a new one.",
+      });
     }
     if (!userId) {
       return res.status(400).json({ message: "User ID not found in session" });
@@ -162,3 +169,15 @@ export const login = (req, res, next) => {
     });
   })(req, res, next);
 };
+
+
+export const logout = (req, res) => {
+  req.logout((err) => {
+    if (err) {
+      console.error("Error logging out:", err);
+      return res.status(500).json({ message: "Internal server error" });
+    }
+    res.status(200).json({ message: "User logged out" });
+  });
+};
+

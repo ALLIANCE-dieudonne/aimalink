@@ -24,7 +24,7 @@ const generateDrive = () => {
     location: `${faker.location.streetAddress()}, ${city}, Rwanda`,
     latitude: generateLatitude(),
     longitude: generateLongitude(),
-    availableAppointments: Math.floor(Math.random() * 100),
+    availableDonations: Math.floor(Math.random() * 100),
   };
 };
 
@@ -40,7 +40,7 @@ async function saveToCSV() {
         { id: "location", title: "Location" },
         { id: "latitude", title: "Latitude" },
         { id: "longitude", title: "Longitude" },
-        { id: "availableAppointments", title: "AvailableAppointments" },
+        { id: "availableDonations", title: "AvailableDonations" },
       ],
     });
 

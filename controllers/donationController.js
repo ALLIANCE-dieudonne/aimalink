@@ -1,6 +1,4 @@
 import Donation from "../db/schemas/donationSchema.js";
-import haversine from "haversine-distance"; // Install using:
-import Drives from "../db/schemas/drivesSchema.js";
 
 export const scheduleDonation = async (req, res) => {
   try {
@@ -15,7 +13,7 @@ export const scheduleDonation = async (req, res) => {
     const startOfDay = new Date(requestedDate.setHours(0, 0, 0, 0));
     const endOfDay = new Date(requestedDate.setHours(23, 59, 59, 999));
 
-    // Check if a donation already exists for the same user on the same date and location
+    // Check if a Donation already exists for the same user on the same date and location
     const existingDonation = await Donation.findOne({
       userId: id,
       driveLocation: location,
@@ -25,11 +23,11 @@ export const scheduleDonation = async (req, res) => {
     if (existingDonation) {
       return res.status(400).json({
         message:
-          "You have already scheduled a donation at this location on the same day.",
+          "You have already scheduled a Donation at this location on the same day.",
       });
     }
 
-    const donation = new Donation({
+    const Donation = new Donation({
       dateTime: req.body.dateTime,
       age: req.body.age,
       driveLocation: location,
@@ -37,11 +35,11 @@ export const scheduleDonation = async (req, res) => {
       userId: id,
     });
 
-    await donation.save();
+    await Donation.save();
     res.status(201).json({ message: "Donation scheduled successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error scheduling donation");
+    res.status(500).send("Error scheduling Donation");
   }
 };
 
@@ -55,59 +53,75 @@ export const getAllSchedules = async (req, res) => {
   }
 };
 
-export const getAllDrives = async (req, res) => {
+export const rescheduleDonation = async (req, res) => {
   try {
-    const userLocation = req.user.location;
+    const { donationId } = req.params; // Get the donationId from request params
+    const id = req.user._id;
 
-    console.log(userLocation);
+    // Extract new date and location from the request body
+    const location = req.body.driveLocation ? req.body.driveLocation : req.user.location;
+    const phone = req.user.phoneNumber || req.body.phoneNumber;
 
-    if (!userLocation) {
-      return res.status(400).json({ message: "User location is required" });
-    }
+    const requestedDate = new Date(req.body.dateTime);
+    const startOfDay = new Date(requestedDate.setHours(0, 0, 0, 0));
+    const endOfDay = new Date(requestedDate.setHours(23, 59, 59, 999));
 
-    // Fetch all drive locations from DB
-    const drives = await Drives.find();
-
-    // Calculate distance for each drive
-    const drivesWithDistance = drives.map((drive) => {
-      if (!drive.Location || !drive.Latitude || !drive.Longitude) {
-        return { ...drive._doc, distance: null }; // If location is missing, set distance as null
-      }
-
-      const driveCoords = { lat: drive.Latitude, lng: drive.Longitude };
-      const distance = haversine(userLocation, driveCoords); // Distance in meters
-
-      return { ...drive._doc, distance: distance / 1000 }; // Convert meters to kilometers
+    // Check if the new rescheduled date and location already have an existing donation
+    const existingDonation = await Donation.findOne({
+      userId: id,
+      driveLocation: location,
+      dateTime: { $gte: startOfDay, $lte: endOfDay },
     });
 
-    // Sort drives by distance (nearest first)
-    drivesWithDistance.sort(
-      (a, b) => (a.distance || Infinity) - (b.distance || Infinity)
-    );
+    if (existingDonation) {
+      return res.status(400).json({
+        message: "You already have a scheduled Donation at this location on the same day.",
+      });
+    }
 
-    res.status(200).json(drivesWithDistance);
+    // Find the donation to be rescheduled
+    const donationToUpdate = await Donation.findById(donationId);
+    if (!donationToUpdate || donationToUpdate.userId.toString() !== id) {
+      return res.status(404).json({ message: "Donation not found or you are not authorized to reschedule" });
+    }
+
+    // Update the donation's date, location, and phone
+    donationToUpdate.dateTime = req.body.dateTime;
+    donationToUpdate.driveLocation = location;
+    donationToUpdate.phone = phone;
+
+    // Save the updated donation
+    await donationToUpdate.save();
+
+    res.status(200).json({ message: "Donation rescheduled successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).send("Error fetching drives");
+    res.status(500).send("Error rescheduling Donation");
   }
 };
 
-export const searchDrive = async (req, res) => {
+export const cancelDonation = async (req, res) => {
   try {
-    const { keyword } = req.query;
-    if (!keyword) {
-      return res.status(400).json({ message: "Keyword is required" });
+    const { donationId } = req.params; // Get the donationId from request params
+    const id = req.user._id;
+
+    // Find and delete the donation
+    const donationToDelete = await Donation.findById(donationId);
+
+    if (!donationToDelete || donationToDelete.userId.toString() !== id) {
+      return res
+        .status(404)
+        .json({
+          message: "Donation not found or you are not authorized to cancel",
+        });
     }
 
-    const results = await Drives.find({
-      $or: [
-        { name: { $regex: keyword, $options: "i" } },
-        { Location: { $regex: keyword, $options: "i" } },
-      ],
-    }).limit(10); // Limit results for performance
+    // Delete the donation
+    await donationToDelete.remove();
 
-    res.status(200).json(results);
+    res.status(200).json({ message: "Donation canceled successfully" });
   } catch (error) {
-    res.status(500).send("Error searching drive" + error);
+    console.error(error);
+    res.status(500).send("Error canceling Donation");
   }
 };

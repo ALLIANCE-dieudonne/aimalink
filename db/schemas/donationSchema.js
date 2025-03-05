@@ -1,7 +1,7 @@
 import mongoose from "mongoose";
 import validator from "validator";
 
-const donationSchema = new mongoose.Schema({
+const DonationSchema = new mongoose.Schema({
   dateTime: {
     type: Date,
     required: true,
@@ -36,5 +36,5 @@ const donationSchema = new mongoose.Schema({
   }
 });
 
-export default mongoose.model("Donation", donationSchema);
+export default mongoose.model("Donation", DonationSchema);
 

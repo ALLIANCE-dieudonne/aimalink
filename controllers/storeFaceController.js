@@ -1,4 +1,3 @@
-import multer from "multer";
 import fs from "fs";
 import path from "path";
 // import tf from "@tensorflow/tfjs-node";
@@ -22,8 +21,8 @@ export const storeFace = async (req, res) => {
     await faceapi.nets.faceRecognitionNet.loadFromDisk(MODEL_PATH);
   }
   loadModels();
+
+  
+
+  if(!image){}
 };
-
-
-
-

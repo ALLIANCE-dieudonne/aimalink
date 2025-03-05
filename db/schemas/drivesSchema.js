@@ -5,7 +5,7 @@ const drivesScema = new mongoose.Schema({
   Location: { type: String, required: true },
   Latitude: { type: String, required: true },
   Longitude: { type: String, required: true },
-  AvailableAppointments: {type: Number, required: true},
+  AvailableDonations: {type: Number, required: true},
 });
 
 export default mongoose.model("Drives", drivesScema);

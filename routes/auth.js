@@ -153,17 +153,4 @@ router.post("/auth/resend-otp",resendOTP);
 router.post("/auth/logout",logout)
 
 
-router.get(
-  "/profile",
-  passport.authenticate("jwt", { session: false }), // Protect route
-  (req, res) => {
-    res.json({ message: "Access granted!", user: req.user });
-  }
-);
-
-
-
-
-
-
 export default router;

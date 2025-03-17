@@ -2,9 +2,13 @@ import mongoose from "mongoose";
 import validator from "validator";
 
 const DonationSchema = new mongoose.Schema({
-  dateTime: {
-    type: Date,
+  date: {
+    type: String,
     required: true,
+  },
+  time: {
+    type: String,
+    require: true,
   },
   phone: {
     type: String,
@@ -12,29 +16,32 @@ const DonationSchema = new mongoose.Schema({
     validate: {
       validator: validator.isMobilePhone,
       message: "Invalid phone number format",
-
     },
 
-    optional: true
+    optional: true,
   },
   age: {
     type: Number,
     required: true,
-    min: [18, "Age must be at least 18"], 
+    min: [18, "Age must be at least 18"],
   },
-  driveLocation: {
-    type: String,
+  driveId: {
+    type: mongoose.Schema.Types.ObjectId,
+    ref:"Drives",
     required: true,
   },
   rapidPass: {
     type: Boolean,
     default: false,
   },
-  userId:{
+  eligibilityCriteria: {
+    type: Boolean,
+    default: false,
+  },
+  userId: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: "User",  
-  }
+    ref: "User",
+  },
 });
 
 export default mongoose.model("Donation", DonationSchema);
-

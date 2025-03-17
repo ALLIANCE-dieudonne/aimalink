@@ -172,12 +172,10 @@ export const login = (req, res, next) => {
 
 
 export const logout = (req, res) => {
-  req.logout((err) => {
-    if (err) {
-      console.error("Error logging out:", err);
-      return res.status(500).json({ message: "Internal server error" });
-    }
-    res.status(200).json({ message: "User logged out" });
+  req.session.destroy((err) => {
+    if (err) return res.status(500).json({ message: "Logout failed" });
+    res.clearCookie("connect.sid"); // If using cookies
+    res.json({ message: "Logged out successfully" });
   });
 };
 

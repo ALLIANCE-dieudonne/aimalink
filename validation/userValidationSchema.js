@@ -87,11 +87,9 @@ export const createUserSchema = {
     },
   },
   bloodGroup: {
-    notEmpty: {
-      errorMessage: "Blood group is required",
-    },
+    optional: true,
     isIn: {
-      options: [["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-"]],
+      options: [["A+", "A-", "B+", "B-", "AB+", "AB-", "O+", "O-", "Not Specified"]],
       errorMessage: "Invalid blood group",
     },
   },
